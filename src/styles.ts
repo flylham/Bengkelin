@@ -22,7 +22,7 @@ export const styles = StyleSheet.create({
 
   subtitle: {
     fontSize: 15,
-    color: "#ddd",
+    color: "#f4eeee",
     marginTop: 5,
   },
 

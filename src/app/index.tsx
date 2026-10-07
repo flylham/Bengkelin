@@ -12,6 +12,7 @@ interface Service {
   category: VehicleType;
   price: number;
   duration: string;
+  color: string;
 }
 
 // ARRAY OF OBJECTS
@@ -22,6 +23,7 @@ const services: Service[] = [
     category: "Motor",
     price: 75000,
     duration: "30 Menit",
+    color: "#00fbde",
   },
   {
     id: 2,
@@ -29,6 +31,7 @@ const services: Service[] = [
     category: "Motor",
     price: 150000,
     duration: "1 Jam",
+    color: "#c507a2",
   },
   {
     id: 3,
@@ -36,6 +39,7 @@ const services: Service[] = [
     category: "Mobil",
     price: 350000,
     duration: "2 Jam",
+    color: "#3e0be3",
   },
   {
     id: 4,
@@ -43,6 +47,7 @@ const services: Service[] = [
     category: "Mobil",
     price: 250000,
     duration: "45 Menit",
+    color: "#f50b0b",
   },
 ];
 
@@ -66,7 +71,7 @@ function ServiceCard({ service }: { service: Service }) {
       <Text style={styles.price}>{formatPrice(service.price)}</Text>
 
       <Pressable
-        style={styles.button}
+        style={[styles.button, { backgroundColor: service.color }]}
         onPress={() =>
           Alert.alert("Booking Servis", `Kamu memilih ${service.name}`)
         }
