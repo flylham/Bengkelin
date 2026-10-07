@@ -44,6 +44,13 @@ const services: Service[] = [
     price: 250000,
     duration: "45 Menit",
   },
+  {
+    id: 5,
+    name: "Ganti Mobil",
+    category: "Mobil",
+    price: 300000,
+    duration: "45 Menit",
+  },
 ];
 
 // CUSTOM FUNCTION
