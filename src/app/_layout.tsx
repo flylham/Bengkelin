@@ -1,18 +1,32 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import { useColorScheme } from "react-native";
+import { Stack } from "expo-router"; // MODUL 2: menggunakan Stack untuk navigasi
 
-import { AnimatedSplashOverlay } from "@/components/animated-icon";
-import AppTabs from "@/components/app-tabs";
-
-SplashScreen.preventAutoHideAsync();
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+export default function RootLayout() {
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <Stack>
+      {/* MODUL 2: mendaftarkan halaman utama */}
+      <Stack.Screen
+        name="index"
+        options={{
+          title: "Bengkelin",
+          headerShown: false,
+        }}
+      />
+
+      {/* MODUL 2: mendaftarkan halaman Tentang */}
+      <Stack.Screen
+        name="explore"
+        options={{
+          title: "Tentang Bengkelin",
+        }}
+      />
+
+      {/* MODUL 2: mendaftarkan halaman booking */}
+      <Stack.Screen
+        name="booking"
+        options={{
+          title: "Booking Servis",
+        }}
+      />
+    </Stack>
   );
 }
