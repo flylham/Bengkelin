@@ -1,4 +1,4 @@
-import { Stack } from "expo-router"; // MODUL 2: menggunakan Stack untuk navigasi
+import { Stack } from "expo-router";
 
 export default function RootLayout() {
   return (
