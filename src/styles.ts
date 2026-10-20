@@ -24,7 +24,6 @@ export const styles = StyleSheet.create({
     color: "#64748B",
   },
 
-  // MODUL 2: judul bagian pencarian dan daftar layanan
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
@@ -32,7 +31,6 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
   },
 
-  // MODUL 2: style kolom pencarian
   searchInput: {
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
@@ -44,14 +42,12 @@ export const styles = StyleSheet.create({
     marginBottom: 16,
   },
 
-  // MODUL 2: tata letak tombol filter
   filterRow: {
     flexDirection: "row",
     gap: 10,
     marginBottom: 24,
   },
 
-  // MODUL 2: tombol filter biasa
   filterButton: {
     borderWidth: 1,
     borderColor: "#2563EB",
@@ -61,23 +57,19 @@ export const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
 
-  // MODUL 2: tombol filter yang sedang aktif
   activeFilterButton: {
     backgroundColor: "#2563EB",
   },
 
-  // MODUL 2: teks filter biasa
   filterText: {
     color: "#2563EB",
     fontWeight: "600",
   },
 
-  // MODUL 2: teks filter aktif
   activeFilterText: {
     color: "#FFFFFF",
   },
 
-  // MODUL 2: judul daftar dan jumlah layanan
   listHeading: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -85,7 +77,6 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
   },
 
-  // MODUL 2: jumlah layanan hasil pencarian
   resultCount: {
     fontSize: 12,
     color: "#64748B",
@@ -153,7 +144,6 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 
-  // MODUL 2: tombol kembali pada halaman booking
   secondaryButton: {
     backgroundColor: "#E2E8F0",
     borderRadius: 10,
@@ -163,7 +153,6 @@ export const styles = StyleSheet.create({
     marginTop: 10,
   },
 
-  // MODUL 2: teks tombol kembali
   secondaryButtonText: {
     color: "#334155",
     fontSize: 14,
@@ -188,7 +177,6 @@ export const styles = StyleSheet.create({
     marginTop: 4,
   },
 
-  // MODUL 2: kartu yang ditampilkan setelah booking berhasil
   successCard: {
     backgroundColor: "#FFFFFF",
     borderRadius: 14,
@@ -200,7 +188,6 @@ export const styles = StyleSheet.create({
     borderColor: "#BBF7D0",
   },
 
-  // MODUL 2: ikon keberhasilan booking
   successIcon: {
     fontSize: 48,
     fontWeight: "bold",
@@ -208,7 +195,6 @@ export const styles = StyleSheet.create({
     marginBottom: 12,
   },
 
-  // MODUL 2: judul pesan keberhasilan
   successTitle: {
     fontSize: 22,
     fontWeight: "bold",
@@ -217,7 +203,6 @@ export const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  // MODUL 2: keterangan booking berhasil
   successMessage: {
     fontSize: 14,
     color: "#475569",

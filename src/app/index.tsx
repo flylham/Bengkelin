@@ -1,16 +1,10 @@
-import { router } from "expo-router"; // MODUL 2: navigasi antarhalaman
-import { useEffect, useState } from "react"; // MODUL 2: menggunakan hook useState dan useEffect
-import {
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput, // MODUL 2: input untuk pencarian layanan
-  View,
-} from "react-native";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
+import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { styles } from "../styles";
 
 type VehicleType = "Motor" | "Mobil";
-type ServiceFilter = "Semua" | VehicleType; // MODUL 2: tipe filter layanan
+type ServiceFilter = "Semua" | VehicleType; // tipe filter layanan
 
 interface Service {
   id: number;
@@ -64,16 +58,16 @@ function formatPrice(price: number) {
 }
 
 export default function HomeScreen() {
-  // MODUL 2: menyimpan kata kunci pencarian menggunakan useState
+  // menyimpan kata kunci pencarian menggunakan useState
   const [keyword, setKeyword] = useState("");
 
-  // MODUL 2: menyimpan kategori filter yang dipilih
+  // menyimpan kategori filter yang dipilih
   const [activeFilter, setActiveFilter] = useState<ServiceFilter>("Semua");
 
-  // MODUL 2: menyimpan hasil filter layanan
+  // menyimpan hasil filter layanan
   const [filteredServices, setFilteredServices] = useState<Service[]>(services);
 
-  // MODUL 2: memperbarui daftar layanan saat keyword atau filter berubah
+  // memperbarui daftar layanan saat keyword atau filter berubah
   useEffect(() => {
     const result = services.filter((service) => {
       const matchesKeyword = service.name
@@ -89,7 +83,7 @@ export default function HomeScreen() {
     setFilteredServices(result);
   }, [keyword, activeFilter]);
 
-  // MODUL 2: pilihan kategori filter
+  // pilihan kategori filter
   const filters: ServiceFilter[] = ["Semua", "Motor", "Mobil"];
 
   return (
@@ -99,7 +93,7 @@ export default function HomeScreen() {
         <Text style={styles.subtitle}>Solusi servis kendaraan kamu</Text>
       </View>
 
-      {/* MODUL 2: kolom pencarian layanan */}
+      {/* kolom pencarian layanan */}
       <Text style={styles.sectionTitle}>Cari Layanan Servis</Text>
 
       <TextInput
@@ -109,7 +103,7 @@ export default function HomeScreen() {
         placeholder="Contoh: ganti oli..."
       />
 
-      {/* MODUL 2: tombol filter berdasarkan jenis kendaraan */}
+      {/* tombol filter berdasarkan jenis kendaraan */}
       <View style={styles.filterRow}>
         {filters.map((filter) => (
           <Pressable
@@ -132,7 +126,7 @@ export default function HomeScreen() {
         ))}
       </View>
 
-      {/* MODUL 2: menampilkan jumlah layanan hasil filter */}
+      {/* menampilkan jumlah layanan hasil filter */}
       <View style={styles.listHeading}>
         <Text style={styles.sectionTitle}>Layanan Bengkel</Text>
         <Text style={styles.resultCount}>
@@ -140,7 +134,7 @@ export default function HomeScreen() {
         </Text>
       </View>
 
-      {/* MODUL 2: menampilkan layanan yang sudah difilter */}
+      {/* menampilkan layanan yang sudah difilter */}
       {filteredServices.length > 0 ? (
         filteredServices.map((service) => (
           <View key={service.id} style={styles.card}>
@@ -153,7 +147,7 @@ export default function HomeScreen() {
 
             <Text style={styles.price}>{formatPrice(service.price)}</Text>
 
-            {/* MODUL 2: router.push membuka halaman booking dan mengirim parameter layanan */}
+            {/* router.push membuka halaman booking dan mengirim parameter layanan */}
             <Pressable
               style={styles.button}
               onPress={() =>
@@ -173,7 +167,7 @@ export default function HomeScreen() {
           </View>
         ))
       ) : (
-        // MODUL 2: tampilan saat layanan tidak ditemukan
+        // tampilan saat layanan tidak ditemukan
         <View style={styles.card}>
           <Text style={styles.serviceName}>Layanan tidak ditemukan</Text>
           <Text style={styles.duration}>Coba kata kunci yang lain.</Text>

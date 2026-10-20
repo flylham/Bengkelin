@@ -3,7 +3,6 @@ import { Stack } from "expo-router"; // MODUL 2: menggunakan Stack untuk navigas
 export default function RootLayout() {
   return (
     <Stack>
-      {/* MODUL 2: mendaftarkan halaman utama */}
       <Stack.Screen
         name="index"
         options={{
@@ -12,7 +11,6 @@ export default function RootLayout() {
         }}
       />
 
-      {/* MODUL 2: mendaftarkan halaman Tentang */}
       <Stack.Screen
         name="explore"
         options={{
@@ -20,7 +18,6 @@ export default function RootLayout() {
         }}
       />
 
-      {/* MODUL 2: mendaftarkan halaman booking */}
       <Stack.Screen
         name="booking"
         options={{
