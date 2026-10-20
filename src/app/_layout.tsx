@@ -1,9 +1,9 @@
-import { Stack } from "expo-router"; // MODUL 2: menggunakan Stack untuk navigasi
+import { Stack } from "expo-router";
 
 export default function RootLayout() {
   return (
     <Stack>
-      {/* MODUL 2: mendaftarkan halaman utama */}
+      {/* mendaftarkan halaman utama */}
       <Stack.Screen
         name="index"
         options={{
@@ -11,16 +11,14 @@ export default function RootLayout() {
           headerShown: false,
         }}
       />
-
-      {/* MODUL 2: mendaftarkan halaman Tentang */}
+      {/* mendaftarkan halaman Tentang */}
       <Stack.Screen
         name="explore"
         options={{
           title: "Tentang Bengkelin",
         }}
       />
-
-      {/* MODUL 2: mendaftarkan halaman booking */}
+      {/* mendaftarkan halaman booking */}
       <Stack.Screen
         name="booking"
         options={{
