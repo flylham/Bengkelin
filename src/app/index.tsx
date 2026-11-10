@@ -1,10 +1,23 @@
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+
+// Mengambil data mobil dan motor dari External API
+import { getMotorcycleMakes, getVehicleMakes } from "../services/vehicleApi";
+
 import { styles } from "../styles";
+import type { VehicleMake } from "../types/vehicle";
 
 type VehicleType = "Motor" | "Mobil";
-type ServiceFilter = "Semua" | VehicleType; // tipe filter layanan
+type ServiceFilter = "Semua" | VehicleType;
 
 interface Service {
   id: number;
@@ -14,7 +27,7 @@ interface Service {
   duration: string;
 }
 
-// Data layanan dari Modul 1
+// Daftar layanan Bengkelin
 const services: Service[] = [
   {
     id: 1,
@@ -53,21 +66,44 @@ const services: Service[] = [
   },
 ];
 
+// Fungsi mengubah angka menjadi format Rupiah
 function formatPrice(price: number) {
   return "Rp" + price.toLocaleString("id-ID");
 }
 
 export default function HomeScreen() {
-  // menyimpan kata kunci pencarian menggunakan useState
+  // Menyimpan kata kunci pencarian layanan
   const [keyword, setKeyword] = useState("");
 
-  // menyimpan kategori filter yang dipilih
+  // Filter kategori layanan
   const [activeFilter, setActiveFilter] = useState<ServiceFilter>("Semua");
 
-  // menyimpan hasil filter layanan
+  // Filter tampilan merek kendaraan
+  const [activeVehicleFilter, setActiveVehicleFilter] =
+    useState<VehicleType>("Mobil");
+
+  // Menyimpan hasil filter layanan
   const [filteredServices, setFilteredServices] = useState<Service[]>(services);
 
-  // memperbarui daftar layanan saat keyword atau filter berubah
+  // Data merek mobil dari API
+  const [vehicleMakes, setVehicleMakes] = useState<VehicleMake[]>([]);
+
+  // Data merek motor dari API
+  const [motorcycleMakes, setMotorcycleMakes] = useState<VehicleMake[]>([]);
+
+  // Merek mobil yang dipilih
+  const [selectedCar, setSelectedCar] = useState<VehicleMake | null>(null);
+
+  // Merek motor yang dipilih
+  const [selectedMotor, setSelectedMotor] = useState<VehicleMake | null>(null);
+
+  // Status loading API
+  const [loading, setLoading] = useState(true);
+
+  // Pesan error API
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // Filter layanan berdasarkan pencarian dan kategori
   useEffect(() => {
     const result = services.filter((service) => {
       const matchesKeyword = service.name
@@ -83,17 +119,242 @@ export default function HomeScreen() {
     setFilteredServices(result);
   }, [keyword, activeFilter]);
 
-  // pilihan kategori filter
+  // Mengambil data merek mobil dan motor dari API
+  const loadVehicleMakes = async () => {
+    try {
+      setLoading(true);
+      setErrorMessage("");
+
+      // Mengambil kedua data secara bersamaan
+      const [cars, motorcycles] = await Promise.all([
+        getVehicleMakes(),
+        getMotorcycleMakes(),
+      ]);
+
+      // Menyimpan data ke state masing-masing
+      setVehicleMakes(cars);
+      setMotorcycleMakes(motorcycles);
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Terjadi kesalahan saat mengambil data",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Mengambil data saat halaman pertama dibuka
+  useEffect(() => {
+    loadVehicleMakes();
+  }, []);
+
+  // Memilih merek mobil
+  const handleSelectCar = (vehicle: VehicleMake) => {
+    setSelectedCar(vehicle);
+
+    Alert.alert("Kendaraan Dipilih", `Merek mobil: ${vehicle.MakeName}`);
+  };
+
+  // Memilih merek motor
+  const handleSelectMotor = (vehicle: VehicleMake) => {
+    setSelectedMotor(vehicle);
+
+    Alert.alert("Kendaraan Dipilih", `Merek motor: ${vehicle.MakeName}`);
+  };
+
+  // Filter kategori layanan
   const filters: ServiceFilter[] = ["Semua", "Motor", "Mobil"];
+
+  // Filter kategori kendaraan
+  const vehicleFilters: VehicleType[] = ["Mobil", "Motor"];
 
   return (
     <ScrollView style={styles.container}>
+      {/* HEADER BENGKELIN */}
       <View style={styles.header}>
         <Text style={styles.logo}>Bengkelin</Text>
         <Text style={styles.subtitle}>Solusi servis kendaraan kamu</Text>
       </View>
 
-      {/* kolom pencarian layanan */}
+      {/* INFORMASI MEREK KENDARAAN */}
+      <View style={styles.card}>
+        <Text style={styles.serviceName}>Informasi Merek Kendaraan</Text>
+
+        <Text style={styles.duration}>
+          Pilih jenis kendaraan untuk melihat daftar mereknya.
+        </Text>
+
+        {/* FILTER MOBIL DAN MOTOR */}
+        <View style={styles.filterRow}>
+          {vehicleFilters.map((filter) => (
+            <Pressable
+              key={filter}
+              style={[
+                styles.filterButton,
+                activeVehicleFilter === filter && styles.activeFilterButton,
+              ]}
+              onPress={() => setActiveVehicleFilter(filter)}
+            >
+              <Text
+                style={[
+                  styles.filterText,
+                  activeVehicleFilter === filter && styles.activeFilterText,
+                ]}
+              >
+                {filter}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+
+        {/* KONDISI LOADING */}
+        {loading ? (
+          <View
+            style={{
+              padding: 15,
+              alignItems: "center",
+            }}
+          >
+            <ActivityIndicator size="large" color="#333" />
+
+            <Text style={{ marginTop: 10 }}>
+              Sedang mengambil data dari server...
+            </Text>
+          </View>
+        ) : errorMessage ? (
+          /* KONDISI ERROR */
+          <View style={{ marginTop: 10 }}>
+            <Text style={{ color: "red" }}>{errorMessage}</Text>
+
+            <Pressable style={styles.button} onPress={loadVehicleMakes}>
+              <Text style={styles.buttonText}>Coba Lagi</Text>
+            </Pressable>
+          </View>
+        ) : (
+          /* DATA KENDARAAN */
+          <View style={{ marginTop: 15 }}>
+            {/* FILTER MOBIL */}
+            {activeVehicleFilter === "Mobil" && (
+              <View>
+                <Text style={[styles.serviceName, { marginBottom: 10 }]}>
+                  Daftar Merek Mobil
+                </Text>
+
+                {vehicleMakes.length > 0 ? (
+                  vehicleMakes.slice(0, 12).map((vehicle) => (
+                    <Pressable
+                      key={vehicle.MakeId}
+                      onPress={() => handleSelectCar(vehicle)}
+                      style={{
+                        padding: 12,
+                        marginBottom: 8,
+                        borderRadius: 8,
+                        borderWidth: 1,
+                        backgroundColor:
+                          selectedCar?.MakeId === vehicle.MakeId
+                            ? "#d1e7dd"
+                            : "#f2f2f2",
+                        borderColor:
+                          selectedCar?.MakeId === vehicle.MakeId
+                            ? "#198754"
+                            : "#dddddd",
+                      }}
+                    >
+                      <Text style={{ fontWeight: "bold" }}>
+                        {vehicle.MakeName}
+                      </Text>
+
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          color: "#666",
+                        }}
+                      >
+                        {selectedCar?.MakeId === vehicle.MakeId
+                          ? "Merek dipilih"
+                          : "Tekan untuk memilih"}
+                      </Text>
+                    </Pressable>
+                  ))
+                ) : (
+                  <Text style={styles.duration}>
+                    Data merek mobil tidak ditemukan.
+                  </Text>
+                )}
+
+                {/* MOBIL YANG DIPILIH */}
+                {selectedCar && (
+                  <Text style={{ marginTop: 5 }}>
+                    Mobil pilihan: {selectedCar.MakeName}
+                  </Text>
+                )}
+              </View>
+            )}
+
+            {/* FILTER MOTOR */}
+            {activeVehicleFilter === "Motor" && (
+              <View>
+                <Text style={[styles.serviceName, { marginBottom: 10 }]}>
+                  Daftar Merek Motor
+                </Text>
+
+                {motorcycleMakes.length > 0 ? (
+                  motorcycleMakes.slice(0, 12).map((motor) => (
+                    <Pressable
+                      key={motor.MakeId}
+                      onPress={() => handleSelectMotor(motor)}
+                      style={{
+                        padding: 12,
+                        marginBottom: 8,
+                        borderRadius: 8,
+                        borderWidth: 1,
+                        backgroundColor:
+                          selectedMotor?.MakeId === motor.MakeId
+                            ? "#d1e7dd"
+                            : "#f2f2f2",
+                        borderColor:
+                          selectedMotor?.MakeId === motor.MakeId
+                            ? "#198754"
+                            : "#dddddd",
+                      }}
+                    >
+                      <Text style={{ fontWeight: "bold" }}>
+                        {motor.MakeName}
+                      </Text>
+
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          color: "#666",
+                        }}
+                      >
+                        {selectedMotor?.MakeId === motor.MakeId
+                          ? "Merek dipilih"
+                          : "Tekan untuk memilih"}
+                      </Text>
+                    </Pressable>
+                  ))
+                ) : (
+                  <Text style={styles.duration}>
+                    Data merek motor tidak ditemukan.
+                  </Text>
+                )}
+
+                {/* MOTOR YANG DIPILIH */}
+                {selectedMotor && (
+                  <Text style={{ marginTop: 5 }}>
+                    Motor pilihan: {selectedMotor.MakeName}
+                  </Text>
+                )}
+              </View>
+            )}
+          </View>
+        )}
+      </View>
+
+      {/* PENCARIAN LAYANAN */}
       <Text style={styles.sectionTitle}>Cari Layanan Servis</Text>
 
       <TextInput
@@ -103,7 +364,7 @@ export default function HomeScreen() {
         placeholder="Contoh: ganti oli..."
       />
 
-      {/* tombol filter berdasarkan jenis kendaraan */}
+      {/* FILTER LAYANAN */}
       <View style={styles.filterRow}>
         {filters.map((filter) => (
           <Pressable
@@ -126,20 +387,22 @@ export default function HomeScreen() {
         ))}
       </View>
 
-      {/* menampilkan jumlah layanan hasil filter */}
+      {/* JUMLAH LAYANAN */}
       <View style={styles.listHeading}>
         <Text style={styles.sectionTitle}>Layanan Bengkel</Text>
+
         <Text style={styles.resultCount}>
           {filteredServices.length} layanan
         </Text>
       </View>
 
-      {/* menampilkan layanan yang sudah difilter */}
+      {/* DAFTAR LAYANAN */}
       {filteredServices.length > 0 ? (
         filteredServices.map((service) => (
           <View key={service.id} style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.serviceName}>{service.name}</Text>
+
               <Text style={styles.category}>{service.category}</Text>
             </View>
 
@@ -147,10 +410,25 @@ export default function HomeScreen() {
 
             <Text style={styles.price}>{formatPrice(service.price)}</Text>
 
-            {/* router.push membuka halaman booking dan mengirim parameter layanan */}
+            {/* TOMBOL BOOKING */}
             <Pressable
               style={styles.button}
-              onPress={() =>
+              onPress={() => {
+                // Mengambil merek sesuai kategori layanan
+                const selectedVehicle =
+                  service.category === "Mobil" ? selectedCar : selectedMotor;
+
+                // Memastikan merek sudah dipilih
+                if (!selectedVehicle) {
+                  Alert.alert(
+                    "Pilih Kendaraan",
+                    `Silakan pilih merek ${service.category.toLowerCase()} terlebih dahulu.`,
+                  );
+
+                  return;
+                }
+
+                // Mengirim data ke halaman booking
                 router.push({
                   pathname: "/booking",
                   params: {
@@ -158,24 +436,28 @@ export default function HomeScreen() {
                     category: service.category,
                     price: String(service.price),
                     duration: service.duration,
+                    vehicleMake: selectedVehicle.MakeName,
                   },
-                })
-              }
+                });
+              }}
             >
               <Text style={styles.buttonText}>Booking Sekarang</Text>
             </Pressable>
           </View>
         ))
       ) : (
-        // tampilan saat layanan tidak ditemukan
+        /* JIKA LAYANAN TIDAK DITEMUKAN */
         <View style={styles.card}>
           <Text style={styles.serviceName}>Layanan tidak ditemukan</Text>
+
           <Text style={styles.duration}>Coba kata kunci yang lain.</Text>
         </View>
       )}
 
+      {/* FOOTER BENGKELIN */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>Bengkelin © 2026</Text>
+
         <Text style={styles.footerSubText}>
           Servis mudah, kendaraan nyaman.
         </Text>
