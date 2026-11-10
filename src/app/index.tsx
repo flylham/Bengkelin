@@ -10,8 +10,12 @@ import {
   View,
 } from "react-native";
 
-// Mengambil data mobil dan motor dari External API
-import { getMotorcycleMakes, getVehicleMakes } from "../services/vehicleApi";
+import {
+  getMotorcycleMakes,
+  getMotorcycleMakesWithThen,
+  getVehicleMakes,
+  getVehicleMakesOrEmpty,
+} from "../services/vehicleApi";
 
 import { styles } from "../styles";
 import type { VehicleMake } from "../types/vehicle";
@@ -128,27 +132,77 @@ export default function HomeScreen() {
 
   // pilihan kategori filter
   // Mengambil data merek mobil dan motor dari API
+  // Fungsi ini tetap mempertahankan alur loading, error, dan state sebelumnya.
   const loadVehicleMakes = async () => {
     try {
       setLoading(true);
       setErrorMessage("");
 
-      // Mengambil kedua data secara bersamaan
-      const [cars, motorcycles] = await Promise.all([
-        getVehicleMakes(),
-        getMotorcycleMakes(),
+      // 1. CUSTOM ASYNC FUNCTION + PRE-BUILT PROMISE.ALL
+      const [carsAsync, motorcyclesAsync] = await Promise.all([
+        getVehicleMakes().catch((error: unknown) => {
+          console.error(
+            "Gagal mengambil data mobil dengan async/await:",
+            error,
+          );
+          return Promise.resolve<VehicleMake[]>([]);
+        }),
+        getMotorcycleMakes().catch((error: unknown) => {
+          console.error(
+            "Gagal mengambil data motor dengan async/await:",
+            error,
+          );
+          return Promise.resolve<VehicleMake[]>([]);
+        }),
       ]);
 
-      // Menyimpan data ke state masing-masing
-      setVehicleMakes(cars);
-      setMotorcycleMakes(motorcycles);
+      // 2. PRE-BUILT FETCH + PROMISE .THEN()
+      const [carsThen, motorcyclesThen] = await Promise.all([
+        getVehicleMakesOrEmpty(),
+        getMotorcycleMakesWithThen().catch((error: unknown) => {
+          console.error("Gagal mengambil data motor dengan .then():", error);
+
+          // Promise.resolve() mengembalikan Promise yang berhasil
+          // dengan nilai cadangan berupa array kosong.
+          return Promise.resolve<VehicleMake[]>([]);
+        }),
+      ]);
+
+      // 3. MENYIMPAN DATA KE DALAM STATE
+      const finalCars = carsAsync.length > 0 ? carsAsync : carsThen;
+      const finalMotorcycles =
+        motorcyclesAsync.length > 0 ? motorcyclesAsync : motorcyclesThen;
+
+      setVehicleMakes(finalCars);
+      setMotorcycleMakes(finalMotorcycles);
+
+      // Menampilkan jumlah data dari kedua pendekatan di console.
+      console.log("=== HASIL ASYNC/AWAIT ===");
+      console.log("Jumlah merek mobil:", carsAsync.length);
+      console.log("Jumlah merek motor:", motorcyclesAsync.length);
+
+      console.log("=== HASIL .THEN() ===");
+      console.log("Jumlah merek mobil:", carsThen.length);
+      console.log("Jumlah merek motor:", motorcyclesThen.length);
+
+      // Jika kedua pendekatan sama-sama tidak mendapatkan data,
+      // tampilkan pesan agar pengguna dapat mencoba kembali.
+      if (finalCars.length === 0 && finalMotorcycles.length === 0) {
+        setErrorMessage(
+          "Data kendaraan tidak tersedia. Periksa koneksi internet lalu coba lagi.",
+        );
+      }
     } catch (error) {
+      // Menangani error yang tidak tertangani oleh catch masing-masing request.
+      console.error("Kesalahan mengambil data kendaraan:", error);
+
       setErrorMessage(
         error instanceof Error
           ? error.message
           : "Terjadi kesalahan saat mengambil data",
       );
     } finally {
+      // Loading selalu dihentikan setelah seluruh proses selesai.
       setLoading(false);
     }
   };
