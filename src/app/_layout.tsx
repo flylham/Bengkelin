@@ -18,7 +18,9 @@ export default function RootLayout() {
           title: "Tentang Bengkelin",
         }}
       />
+
       {/* mendaftarkan halaman booking */}
+
       <Stack.Screen
         name="booking"
         options={{

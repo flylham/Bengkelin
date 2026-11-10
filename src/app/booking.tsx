@@ -5,11 +5,13 @@ import { styles } from "../styles";
 
 export default function BookingScreen() {
   // menerima detail layanan dari router.push()
+  // menerima detail layanan dan merek kendaraan dari router.push()
   const params = useLocalSearchParams<{
     service?: string;
     category?: string;
     price?: string;
     duration?: string;
+    vehicleMake?: string; // tambahan: menerima merek kendaraan
   }>();
 
   // menentukan apakah booking sudah dikonfirmasi
@@ -56,6 +58,14 @@ export default function BookingScreen() {
 
           <Text style={styles.duration}>Jenis kendaraan</Text>
           <Text style={styles.serviceName}>{params.category ?? "-"}</Text>
+
+          {/* tambahan: menampilkan merek mobil jika tersedia */}
+          {params.category === "Mobil" && params.vehicleMake ? (
+            <>
+              <Text style={styles.duration}>Merek kendaraan</Text>
+              <Text style={styles.serviceName}>{params.vehicleMake}</Text>
+            </>
+          ) : null}
 
           <Text style={styles.duration}>Durasi</Text>
           <Text style={styles.serviceName}>{params.duration ?? "-"}</Text>

@@ -15,8 +15,7 @@ export const styles = StyleSheet.create({
   logo: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#1D4ED8",
-    marginBottom: 6,
+    color: "#fe0707",
   },
 
   subtitle: {
