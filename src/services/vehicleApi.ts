@@ -1,9 +1,5 @@
 import type { VehicleMake, VehicleMakeResponse } from "../types/vehicle";
 
-// ==========================================
-// 1. EXTERNAL API
-// ==========================================
-
 // API untuk mengambil daftar merek mobil
 const CAR_API =
   "https://vpic.nhtsa.dot.gov/api/vehicles/GetMakesForVehicleType/car?format=json";
