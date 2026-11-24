@@ -17,6 +17,7 @@ import {
   getVehicleMakesOrEmpty,
 } from "../services/vehicleApi";
 
+import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import type { VehicleMake } from "../types/vehicle";
 
@@ -80,7 +81,28 @@ const services: Service[] = [
 function formatPrice(price: number) {
   return "Rp" + price.toLocaleString("id-ID");
 }
+
 export default function HomeScreen() {
+  // Mengambil data pengguna dan fungsi logout
+  const { user, signOut } = useAuth();
+  const [logoutLoading, setLogoutLoading] = useState(false);
+
+  // Menangani proses logout
+  const handleLogout = async () => {
+    try {
+      setLogoutLoading(true);
+      const { error } = await signOut();
+
+      if (error) throw error;
+
+      router.replace("/login");
+    } catch (error: any) {
+      Alert.alert("Logout Gagal", error.message);
+    } finally {
+      setLogoutLoading(false);
+    }
+  };
+
   // menyimpan kata kunci pencarian menggunakan useState
   const [keyword, setKeyword] = useState("");
 
@@ -238,6 +260,21 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <Text style={styles.logo}>Bengkelin</Text>
         <Text style={styles.subtitle}>Solusi servis kendaraan kamu</Text>
+
+        {/* Menampilkan akun yang sedang login */}
+        <Text style={{ marginTop: 10, color: "#666" }}>
+          Login sebagai: {user?.email}
+        </Text>
+
+        <Pressable
+          style={[styles.button, { marginTop: 10, backgroundColor: "#dc3545" }]}
+          onPress={handleLogout}
+          disabled={logoutLoading}
+        >
+          <Text style={styles.buttonText}>
+            {logoutLoading ? "Sedang Logout..." : "Logout"}
+          </Text>
+        </Pressable>
       </View>
 
       {/* kolom pencarian layanan */}
