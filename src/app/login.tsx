@@ -20,8 +20,11 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loginError, setLoginError] = useState("");
 
   const handleAuth = async () => {
+    setLoginError("");
+
     if (!email.trim() || !password.trim()) {
       Alert.alert("Peringatan", "Email dan password wajib diisi.");
       return;
@@ -52,13 +55,24 @@ export default function LoginScreen() {
       } else {
         const { error } = await signIn(email, password);
 
-        if (error) throw error;
+        if (error) {
+          setLoginError(
+            "Email belum terdaftar atau password yang kamu masukkan salah.",
+          );
+          return;
+        }
 
         Alert.alert("Berhasil", "Login berhasil.");
         router.replace("/");
       }
     } catch (error: any) {
-      Alert.alert("Gagal", error.message || "Terjadi kesalahan.");
+      if (isRegister) {
+        Alert.alert("Registrasi Gagal", error.message || "Terjadi kesalahan.");
+      } else {
+        setLoginError(
+          "Login gagal. Periksa email dan password atau coba lagi.",
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -67,6 +81,7 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Bengkelin</Text>
+
       <Text style={styles.subtitle}>
         {isRegister ? "Buat akun baru" : "Silakan masuk ke akun Anda"}
       </Text>
@@ -76,7 +91,10 @@ export default function LoginScreen() {
           style={styles.input}
           placeholder="Nama pengguna"
           value={callsign}
-          onChangeText={setCallsign}
+          onChangeText={(value) => {
+            setCallsign(value);
+            setLoginError("");
+          }}
         />
       )}
 
@@ -84,7 +102,10 @@ export default function LoginScreen() {
         style={styles.input}
         placeholder="Email"
         value={email}
-        onChangeText={setEmail}
+        onChangeText={(value) => {
+          setEmail(value);
+          setLoginError("");
+        }}
         keyboardType="email-address"
         autoCapitalize="none"
       />
@@ -93,9 +114,16 @@ export default function LoginScreen() {
         style={styles.input}
         placeholder="Password"
         value={password}
-        onChangeText={setPassword}
+        onChangeText={(value) => {
+          setPassword(value);
+          setLoginError("");
+        }}
         secureTextEntry
       />
+
+      {!isRegister && loginError !== "" && (
+        <Text style={styles.errorText}>{loginError}</Text>
+      )}
 
       <TouchableOpacity
         style={styles.button}
@@ -112,7 +140,10 @@ export default function LoginScreen() {
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => setIsRegister(!isRegister)}
+        onPress={() => {
+          setIsRegister(!isRegister);
+          setLoginError("");
+        }}
         disabled={loading}
       >
         <Text style={styles.switchText}>
@@ -148,6 +179,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 14,
     marginBottom: 15,
+  },
+  errorText: {
+    color: "#dc3545",
+    backgroundColor: "#f8d7da",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 15,
+    textAlign: "center",
   },
   button: {
     backgroundColor: "#2563eb",
